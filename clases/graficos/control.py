@@ -33,7 +33,7 @@ class Control(Surface):
         self._coordenada_x = coordenada_x
         self._coordenada_y = coordenada_y
 
-    def _renderizar(self):
+    def renderizar(self):
         self.fill(self._color)
         self.blit(self._imagen_fondo, (0,0))
 
@@ -121,6 +121,10 @@ class Contenedor(Control):
         porcentaje_diferencia_alto = diferencia_alto * 100 / self._alto
 
         return [porcentaje_diferencia_ancho, porcentaje_diferencia_alto]
+
+    def eliminar_control_hijo(self, control_hijo: Control):
+        self._controles_hijos.remove(control_hijo)
+        self.renderizar()
 
     # Si se le pasa un control hijo al método renderizador se renderiza solo ese hijo,
     # en el caso contrario se renderizan todos.

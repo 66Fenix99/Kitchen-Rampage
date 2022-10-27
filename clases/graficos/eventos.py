@@ -1,8 +1,11 @@
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractproperty
+from typing import List
 from pygame import KEYDOWN, MOUSEBUTTONDOWN
+from pygame.event import Event
+from .control import Control
 
 class Comando:
-    def __init__(self, funcion, *argumentos):
+    def __init__(self, funcion: function, *argumentos):
         self.__funcion = funcion
         self.__argumentos = argumentos
 
@@ -10,7 +13,7 @@ class Comando:
         self.__funcion(*self.__argumentos)
 
 class Evento:
-    def __init__(self, codigo, informacion):        
+    def __init__(self, codigo: int, informacion: Event):        
         self.__codigo = codigo
         self.__informacion = informacion
 
@@ -26,11 +29,11 @@ class Evento:
 # validar_emision() de este último.
 
 class Receptor_Evento(ABC):
-    def __init__(self, emisor, comandos):
+    def __init__(self, emisor: Control, comandos: List[Comando]):
         self._emisor = emisor
         self._comandos = comandos
 
-    @property
+    @abstractproperty
     def codigo(self):
         pass
 
@@ -42,15 +45,15 @@ class Receptor_Evento(ABC):
         for comando in self._comandos:
             comando.ejecutar()
 
-class Click(Receptor_Evento):
-    def __init__(self, emisor, comando):
-        super().__init__(emisor, comando)
+class Receptor_Click(Receptor_Evento):
+    def __init__(self, emisor: Control, comandos: List[Comando]):
+        super().__init__(emisor, comandos)
         
     @property
     def codigo(self):
         return MOUSEBUTTONDOWN
 
-    def validar_emision(self, evento):
+    def validar_emision(self, evento: Evento):
         click_posicion_x, click_posicion_y = evento.informacion.pos[0], evento.informacion.pos[1]
         
         # Declaramos variables para cada lado del control para que sea más legible.
@@ -61,20 +64,16 @@ class Click(Receptor_Evento):
         control_lado_inferior = control_lado_superior + self._emisor.alto
 
         # Se valida si las coordenadas del click están dentro del area del control.
-        if control_lado_izquierdo < click_posicion_x < control_lado_derecho and control_lado_superior < click_posicion_y < control_lado_inferior:
-            return True
-        return False
+        return control_lado_izquierdo < click_posicion_x < control_lado_derecho and control_lado_superior < click_posicion_y < control_lado_inferior
 
-class Tecla_Presionada(Receptor_Evento):
-    def __init__(self, codigo_tecla, emisor, comando):
-        super().__init__(emisor, comando)
+class Receptor_Tecla_Presionada(Receptor_Evento):
+    def __init__(self, emisor: Control, comandos: List[Comando], codigo_tecla: int):
+        super().__init__(emisor, comandos)
         self.__codigo_tecla = codigo_tecla
     
     @property
     def codigo(self):
         return KEYDOWN
 
-    def validar_emision(self, evento):
-        if evento.informacion.key == self.__codigo_tecla:
-            return True      
-        return False
+    def validar_emision(self, evento: Evento):
+        return evento.informacion.key == self.__codigo_tecla
