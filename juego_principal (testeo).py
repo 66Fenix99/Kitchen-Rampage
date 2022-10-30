@@ -1,25 +1,25 @@
-# import pygame
-# from pygame import *
+import pygame
+from pygame import *
+import sys
+fps = 60
+pygame.init()
 
-# fps = 60
-# pygame.init()
 
+info = pygame.display.Info()
+width = info.current_w
+height = info.current_h
 
-# info = pygame.display.Info()
-# w = info.current_w
-# h = info.current_h
-
-# ventana = pygame.display.set_mode((info.current_w, info.current_h-50), RESIZABLE)
+ventana = pygame.display.set_mode((info.current_w, info.current_h-50), RESIZABLE)
 
 
 # color_principal = "#fff4bf"
 
 
 
-# # pantalla_principal = pygame.Surface((infoObject.current_w, infoObject.current_h))
-# # pantalla_principal.fill(color_principal)
+# pantalla_principal = pygame.Surface((infoObject.current_w, infoObject.current_h))
+# pantalla_principal.fill(color_principal)
 
-# # ventana = pygame.display.set_mode((width, height))
+ventana = pygame.display.set_mode((width, height))
 
 # imagen = pygame.image.load("recursos/imagenes/kitchen-rampage-logo.png")
 # imagen = pygame.transform.scale(imagen, (info.current_w, info.current_h-50))
@@ -31,28 +31,26 @@
 # reloj = pygame.time.Clock()
 
 # # rectangulo = pygame.draw.
-# pantalla_completa = True
+pantalla_completa = True
 
-# while activo:
-#     for evento in pygame.event.get([MOUSEBUTTONDOWN, KEYDOWN, QUIT]):
-#         print(evento.type)
-#         if evento.type == pygame.QUIT:
-#             activo = False
-#         if evento.type == pygame.MOUSEBUTTONDOWN:
-#             print(evento.pos[0], evento.pos[1])
-#         if evento.type == pygame.KEYDOWN:
-#             tecla = evento.key
-#             if evento.key == K_F11:
-#                 pantalla_completa = not pantalla_completa
-#                 if pantalla_completa:
-#                     ventana = pygame.display.set_mode((info.current_w, info.current_h), FULLSCREEN)
-#                 else:
-#                     ventana = pygame.display.set_mode((info.current_w, info.current_h-50), RESIZABLE)
-#         print(evento)
-#     ventana.blit(imagen, (0,0))
-#     pygame.display.update()
+activo = True
 
-#     reloj.tick(fps)
+while activo:
+    for evento in pygame.event.get([MOUSEBUTTONDOWN, KEYDOWN, QUIT]):
+        print(evento.type)
+        if evento.type == pygame.QUIT:
+            activo = False
+        if evento.type == pygame.MOUSEBUTTONDOWN:
+            print(evento.pos[0], evento.pos[1])
+        if evento.type == pygame.KEYDOWN:
+            tecla = evento.key
+            if evento.key == K_F11:
+                pantalla_completa = not pantalla_completa
+                if pantalla_completa:
+                    ventana = pygame.display.set_mode((info.current_w, info.current_h), FULLSCREEN)
+                else:
+                    ventana = pygame.display.set_mode((info.current_w, info.current_h-50), RESIZABLE)
+    pygame.display.update()
 
 # pygame.quit()
 

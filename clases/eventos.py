@@ -1,11 +1,9 @@
 from abc import ABC, abstractmethod, abstractproperty
-from typing import List
 from pygame import KEYDOWN, MOUSEBUTTONDOWN
 from pygame.event import Event
-from .control import Control
 
 class Comando:
-    def __init__(self, funcion: function, *argumentos):
+    def __init__(self, funcion, *argumentos):
         self.__funcion = funcion
         self.__argumentos = argumentos
 
@@ -29,7 +27,7 @@ class Evento:
 # validar_emision() de este último.
 
 class Receptor_Evento(ABC):
-    def __init__(self, emisor: Control, comandos: List[Comando]):
+    def __init__(self, emisor, comandos):
         self._emisor = emisor
         self._comandos = comandos
 
@@ -46,7 +44,7 @@ class Receptor_Evento(ABC):
             comando.ejecutar()
 
 class Receptor_Click(Receptor_Evento):
-    def __init__(self, emisor: Control, comandos: List[Comando]):
+    def __init__(self, emisor, comandos):
         super().__init__(emisor, comandos)
         
     @property
@@ -67,7 +65,7 @@ class Receptor_Click(Receptor_Evento):
         return control_lado_izquierdo < click_posicion_x < control_lado_derecho and control_lado_superior < click_posicion_y < control_lado_inferior
 
 class Receptor_Tecla_Presionada(Receptor_Evento):
-    def __init__(self, emisor: Control, comandos: List[Comando], codigo_tecla: int):
+    def __init__(self, emisor, comandos, codigo_tecla: int):
         super().__init__(emisor, comandos)
         self.__codigo_tecla = codigo_tecla
     

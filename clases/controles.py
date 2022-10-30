@@ -1,7 +1,8 @@
 from pygame import SHOWN, display, FULLSCREEN, Surface
+from pygame.transform import scale
 from pygame.time import Clock
 from pygame.font import SysFont
-from .control import Contenedor, Control
+from control import Contenedor, Control
 
 class Pantalla(Contenedor):
     def __init__(self, ancho: int, alto: int, titulo: str):
@@ -13,28 +14,30 @@ class Pantalla(Contenedor):
         return self.__titulo
 
 class Ventana():
-    def __init__(self, ancho: int, alto: int, pantalla: Pantalla):
-        self = display.set_mode((ancho, alto), self.__estado_vista)
+    def __init__(self, ancho: int, alto: int):
+        self.__referencia_ventana_pygame = display.set_mode((ancho, alto), SHOWN)
         self.__ancho = ancho
         self.__alto = alto
         self.__estado_vista = SHOWN
         self.__FPS = 25
         self.__reloj = Clock()
-        self.__pantalla_actual = pantalla
+        self.__pantalla_actual = None
 
     def establecer_tamaño(self, ancho: int, alto: int):
         self.__ancho = ancho
         self.__alto = alto
 
-        self.__pantalla_actual.establecer_tamaño(ancho, alto)
+        self.__referencia_ventana_pygame = display.set_mode((self.__ancho, self.__alto), self.__estado_vista)
+        self.__pantalla_actual._establecer_tamaño_relativo(self.__referencia_ventana_pygame.get_size()[0], self.__referencia_ventana_pygame.get_size()[1])
+        self.renderizar()
 
     def establecer_vista(self):
         if self.__estado_vista == SHOWN:
             self.__estado_vista = FULLSCREEN
         else:
             self.__estado_vista = SHOWN
-        
-        self = display.set_mode((self.__ancho, self.__alto), self.__estado_vista)
+
+        self.establecer_tamaño(self.__ancho, self.__alto)
 
     def establecer_FPS(self, FPS: int):
         self.__FPS = FPS
@@ -42,17 +45,28 @@ class Ventana():
     def establecer_pantalla(self, pantalla: Pantalla):
         self.__pantalla_actual = pantalla
         self.__pantalla_actual._establecer_contenedor(self)
-        self.__pantalla_actual._establecer_coordenadas(0,0)
+        self.__pantalla_actual.establecer_coordenadas(0,0)
         display.set_caption(pantalla.titulo)
+        self.renderizar()
 
     def establecer_icono(self, icono: Surface):
         display.set_icon(icono)
 
     def renderizar(self):
-        self.__pantalla_actual.renderizar()
-        self.blit(self.__pantalla_actual, (0,0))
+        pantalla_escalada = scale(self.__pantalla_actual, (self.__referencia_ventana_pygame.get_size()[0], self.__referencia_ventana_pygame.get_size()[1]))
+        self.__referencia_ventana_pygame.blit(pantalla_escalada, (0,0))
+
+    def actualizar(self):
         self.__reloj.tick(self.__FPS)
         display.update()
+
+    @property
+    def ancho(self):
+        return self.__ancho
+
+    @property
+    def alto(self):
+        return self.__alto
 
     @property
     def estado_vista(self):
@@ -87,8 +101,8 @@ class Recuadro(Control):
         self.blit(self._imagen_fondo, (0,0))
         texto_renderizado = self.__fuente.render(self.__texto, True, self.__color_texto)
         
-        posicion_centrada_x = self._ancho / 2 - texto_renderizado.get_size()[0] / 2
-        posicion_centrada_y = self._alto / 2 - texto_renderizado.get_size()[1] / 2
+        posicion_centrada_x = self._ancho_absoluto / 2 - texto_renderizado.get_size()[0] / 2
+        posicion_centrada_y = self._alto_absoluto / 2 - texto_renderizado.get_size()[1] / 2
 
         self.blit(texto_renderizado, (posicion_centrada_x, posicion_centrada_y))
 

@@ -2,7 +2,7 @@ from abc import ABC, abstractclassmethod
 from string import ascii_lowercase as abecedario
 from requests import get as consultar
 from ingrediente import Ingrediente
-from herramientas import Imagen
+from imagen import Imagen
 from platillo import Platillo
 
 class API(ABC):
