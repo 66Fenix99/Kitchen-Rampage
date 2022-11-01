@@ -30,9 +30,14 @@ class TheMealDB(API):
 
     @classmethod
     def llenar_base_de_datos(cls):
+        traductor = Traductor("en", "es")
         platillos_json = cls.obtener_platillos_json()
         for platillo_json in platillos_json:
-            Platillos_DAO.insertar(platillo_json["strMeal"], platillo_json[""])
+            if platillo_json["strMealThumb"]:
+                nombre = traductor.traducir(platillo_json["strMeal"])
+                receta = traductor.traducir(platillo_json["strInstructions"])
+                imagen = Imagen.convertir_url_a_bytes(platillo_json["strMealThumb"])
+                Platillos_DAO.insertar(platillo_json["strMeal"], platillo_json[""])
 
     @classmethod
     def obtener_platillos_json(cls):
