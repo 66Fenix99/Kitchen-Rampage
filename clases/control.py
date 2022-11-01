@@ -49,6 +49,9 @@ class Control(Surface):
     def agregar_receptor(self, receptor: Receptor_Evento):
         self._receptores_eventos.append(receptor)
 
+    def limpiar_receptores(self):
+        self._receptores_eventos.clear()
+
     def evaluar_evento(self, evento: Evento):
         for receptor in self._receptores_eventos:
             if receptor.codigo == evento.codigo:
@@ -99,6 +102,9 @@ class Contenedor(Control):
         control_hijo._establecer_coordenadas_relativas(coordenada_x, coordenada_y)
         self._controles_hijos.append(control_hijo)
         self.renderizar(control_hijo)
+
+    def eliminar_control_hijo(self, control_hijo: Control):
+        self._controles_hijos.remove(control_hijo)
 
     def _establecer_tamaño_relativo(self, ancho: int, alto: int):
         self._establecer_tamaño_relativo_en_hijos(ancho, alto)

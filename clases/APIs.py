@@ -1,12 +1,12 @@
 from abc import ABC, abstractclassmethod
 from string import ascii_lowercase as abecedario
-from requests import get as consultar
-from ingrediente import Ingrediente
+from requests import get
+from ingrediente import Ingredientes_DAO
 from imagen import Imagen
-from platillo import Platillo
+from platillo import Platillos_DAO, RecetaIngredientes_DAO
+from traductor import Traductor
 
 class API(ABC):
-
     @abstractclassmethod
     def chequear_conexion_exitosa(cls):
         pass
@@ -17,39 +17,38 @@ class API(ABC):
 
 
 class TheMealDB(API):
-
     __url = "http://www.themealdb.com/api/json/v1/1/search.php"
 
     @classmethod
     def chequear_conexion_exitosa(cls):
-        respuesta = consultar(cls.__url)
-        if respuesta.status_code == 200:
-            return True
-        return False
+        respuesta = get(cls.__url)
+        return respuesta.status_code == 200
 
     @classmethod
-    def devolver_informacion(cls, parametros: None):
-        respuesta = consultar(cls.__url).json()
-        return respuesta
+    def consultar(cls, parametros: None):
+        return get(cls.__url, parametros).json()
 
     @classmethod
-    def devolver_lista_platillos(cls):
-        lista_platillos = []
+    def llenar_base_de_datos(cls):
+        platillos_json = cls.obtener_platillos_json()
+        for platillo_json in platillos_json:
+            Platillos_DAO.insertar(platillo_json["strMeal"], platillo_json[""])
+
+    @classmethod
+    def obtener_platillos_json(cls):
+        platillos_json = []
         parametros = {}
         
         for letra in abecedario:
             parametros["f"] = letra
             respuesta = cls.devolver_informacion(parametros)
-            lista_platillos_api = respuesta["meals"]
+            if respuesta["meals"]:
+                platillos_json = [*platillos_json, *respuesta["meals"]]
 
-            if lista_platillos_api:
-                for platillo_api in lista_platillos_api:
-                    lista_platillos.append(cls.crear_platillo(platillo_api))                    
-        
-        return lista_platillos
+        return platillos_json
 
     @classmethod
-    def crear_lista_ingredientes(cls, platillo_api):
+    def obtener_ingredientes_json(cls, platillo_api):
         lista_ingredientes = []
 
         for clave in platillo_api:
@@ -77,3 +76,4 @@ class TheMealDB(API):
         return imagen_ingrediente
 
 print(TheMealDB.chequear_conexion_exitosa())
+print(TheMealDB.devolver_platillos_json()[0])
